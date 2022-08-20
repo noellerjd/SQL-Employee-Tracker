@@ -4,6 +4,7 @@ const mysql = require("mysql2");
 require("dotenv").config();
 // const dotenv = require("dotenv");
 const inquirer = require("inquirer");
+const e = require("express");
 // const { Sequelize, DataTypes } = require("sequelize");
 // const sequelize = new Sequelize("sqlite::memory:");
 // const fs = require("fs");
@@ -89,10 +90,6 @@ const init = () => {
                             value: "viewEmployees",
                           },
                           {
-                            name: "Add Employee",
-                            value: "addEmployee",
-                          },
-                          {
                             name: `Delete ${response.departmentName} department`,
                             value: "deleteDepartment",
                           },
@@ -102,9 +99,15 @@ const init = () => {
                     .then((response) => {
                       switch (response.selectAction) {
                         case "viewEmployees":
-                          break;
-
-                        case "addEmployee":
+                          var sql = `SELECT * FROM employees WHERE department = '${department}'`;
+                          con.query(sql, function (err, result) {
+                            if (err) throw err;
+                            console.table(result, [
+                              "firstName",
+                              "lastName",
+                              "department",
+                            ]);
+                          });
                           break;
 
                         case "deleteDepartment":
@@ -182,6 +185,92 @@ const init = () => {
               console.log("Returning to main menu...");
               console.log("-------------------------");
               init();
+            }
+          });
+      }
+      if (response.options === "viewEmployees") {
+        con.connect(function (err) {
+          if (err) throw err;
+          con.query("SELECT * FROM employees", function (err, result, fields) {
+            if (err) throw err;
+            console.table(result, ["firstName", "lastName", "department"]);
+          });
+        });
+      }
+      if (response.options === "addEmployee") {
+        inquirer
+          .prompt([
+            {
+              type: "input",
+              name: "firstName",
+              message: "What is the employee's first name?",
+            },
+            {
+              type: "input",
+              name: "lastName",
+              message: "What is the employee's last name?",
+            },
+            {
+              type: "number",
+              name: "salary",
+              message: "What is the employee's salary?",
+            },
+          ])
+          .then((response) => {
+            if (!response.salary) {
+              console.log("Invalid salary");
+              console.log("-------------------------");
+              console.log("Returning to main menu...");
+              console.log("-------------------------");
+              init();
+              return;
+            }
+            if (response) {
+              let employeeData = {
+                firstName: response.firstName,
+                lastName: response.lastName,
+                salary: response.salary,
+                department: "",
+              };
+              con.connect(function (err) {
+                con.query(
+                  "SELECT * FROM departments",
+                  function (err, result, fields) {
+                    if (err) throw err;
+                    let departmentList = [];
+                    result.forEach((element) => {
+                      departmentList.push({
+                        name: element.name,
+                        value: element.name,
+                      });
+                    });
+                    inquirer
+                      .prompt([
+                        {
+                          type: "list",
+                          name: "department",
+                          message: `Which department does ${response.firstName} belong to?`,
+                          choices: departmentList,
+                        },
+                      ])
+                      .then((response) => {
+                        employeeData.department = response.department;
+                        var sql = `INSERT INTO employees (firstName, lastName, salary, department) VALUES ('${employeeData.firstName}', '${employeeData.lastName}', ${employeeData.salary}, '${employeeData.department}')`;
+
+                        con.query(sql, function (err, result) {
+                          if (err) throw err;
+                          console.log(
+                            `${employeeData.firstName} has been added under the department ${employeeData.department}`
+                          );
+                          console.log("-------------------------");
+                          console.log("Returning to main menu...");
+                          console.log("-------------------------");
+                          init();
+                        });
+                      });
+                  }
+                );
+              });
             }
           });
       }
