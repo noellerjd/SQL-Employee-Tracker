@@ -11,6 +11,13 @@ CREATE TABLE departments (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE SALES AS 
-SELECT id, name
-FROM departments
+CREATE TABLE employees (
+    id INT NOT NULL AUTO_INCREMENT,
+    firstName VARCHAR (30) NOT NULL,
+    lastName VARCHAR (30) NOT NULL,
+    salary INT NOT NULL,
+    department VARCHAR (30) NOT NULL,
+
+    PRIMARY KEY (id)
+)
+
