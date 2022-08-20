@@ -19,6 +19,8 @@ I learned a lot about how databases are structured and how to utilize node to ad
 
 ## Installation
 
+[Link to Video Demonstration](https://drive.google.com/file/d/1VWV0DitkjuT92sVi5136zR3r73rPABf6/view?usp=sharing)
+
 In order to install this project you'll want to download the full folder from github, then within your terminal located in the folder, you'll want to run a npm i, after the node modules have been loaded, SOURCE the schema.sql within the /db/ file in your terminal through sql. After that you can run npm start and the application should load.
 
 ## Usage
