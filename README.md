@@ -40,7 +40,3 @@ Contact me if you have any questions or wish to contribute!
 ### Link to Github:
 
 https://github.com/noellerjd
-
-## Tests
-
-none
